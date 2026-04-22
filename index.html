@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Япония · 12 — 25 мая 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --paper: #ffffff;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-mute: #999;
+    --line: #e5e5e1;
+    --line-soft: #ededea;
+    --red: #bc002d;        /* Japan flag red */
+    --red-soft: #d4334e;
+    --serif: "Instrument Serif", "Cormorant Garamond", "Times New Roman", serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--red); color: #fff; }
+
+  /* ── HEADER ────────────────────────────────────────────── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 32px;
+    background: rgba(250,250,247,0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--line);
+  }
+  .logo {
+    font-family: var(--serif);
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .logo .dot { color: var(--red); }
+  .logo .it { font-style: italic; }
+  .menu-trigger {
+    font-family: var(--sans);
+    font-size: 13px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.02em;
+  }
+  .menu-trigger .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+    display: inline-block;
+  }
+
+  /* ── MENU OVERLAY ──────────────────────────────────────── */
+  .menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 99;
+    padding: 100px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transform: translateY(-100%);
+    transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+    overflow-y: auto;
+  }
+  .menu-overlay.open { transform: translateY(0); }
+  .menu-row {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 24px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line-soft);
+    text-decoration: none;
+    color: var(--ink);
+    transition: padding 0.3s;
+  }
+  .menu-row:hover { padding-left: 12px; }
+  .menu-row:hover .menu-title { color: var(--red); }
+  .menu-num {
+    font-family: var(--serif);
+    font-size: 14px;
+    color: var(--ink-mute);
+    font-style: italic;
+  }
+  .menu-title {
+    font-family: var(--serif);
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    transition: color 0.3s;
+  }
+  .menu-title .it { font-style: italic; }
+  .menu-meta {
+    font-size: 12px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── SECTION ───────────────────────────────────────────── */
+  section {
+    padding: 100px 32px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  section.no-border { border-bottom: none; }
+
+  .section-info {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin: -100px -32px 80px;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+  }
+  .section-info .right { text-align: right; }
+  .section-info .arrow {
+    width: 16px;
+    height: 16px;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    transform: rotate(45deg);
+    margin: 0 auto;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; }
+
+  /* ── HERO ──────────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    padding: 120px 32px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-info {
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 320px;
+    margin-bottom: 80px;
+  }
+  .hero-info .lbl {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    color: var(--ink-mute);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(96px, 22vw, 320px);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    margin-bottom: 32px;
+  }
+  .hero-title .it {
+    font-style: italic;
+    color: var(--red);
+  }
+  .hero-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: end;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+  .hero-dates {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 44px);
+    font-style: italic;
+    line-height: 1;
+  }
+  .hero-meta {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+  .hero-meta sup {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 11px;
+    margin-left: 2px;
+  }
+
+  /* ── INFOS SECTION (rows with vertical line) ──────────── */
+  .info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .info-row {
+    display: grid;
+    grid-template-columns: 1px 1fr;
+    gap: 32px;
+    padding: 32px 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .info-row:last-child { border-bottom: 1px solid var(--line-soft); }
+  .info-row .line { background: var(--ink); width: 1px; height: 100%; min-height: 60px; }
+  .info-row .body { display: flex; flex-direction: column; gap: 12px; }
+  .info-num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-mute);
+  }
+  .info-h {
+    font-family: var(--serif);
+    font-size: clamp(22px, 3vw, 32px);
+    line-height: 1.25;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    max-width: 800px;
+  }
+  .info-h .it { font-style: italic; color: var(--red); }
+
+  /* ── CREW PILLS ────────────────────────────────────────── */
+  .crew {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .crew-pill {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    padding: 4px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-soft);
+  }
+
+  /* ── COUNTDOWN ─────────────────────────────────────────── */
+  .countdown {
+    display: flex;
+    gap: 32px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .cd-item .num {
+    font-family: var(--serif);
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .cd-item .num.red { color: var(--red); }
+  .cd-item .lbl {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    margin-top: 6px;
+  }
+
+  /* ── MAP ───────────────────────────────────────────────── */
+  #map {
+    height: 540px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+  }
+  .leaflet-container {
+    background: #f4f4f0 !important;
+    font-family: var(--sans) !important;
+  }
+  .leaflet-popup-content-wrapper {
+    background: #fff !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+  }
+  .leaflet-popup-tip { background: #fff !important; }
+  .leaflet-popup-content { margin: 12px 16px !important; font-size: 12px !important; line-height: 1.5; }
+  .leaflet-popup-content b { font-family: var(--serif); font-size: 16px; font-weight: 400; display: block; margin-bottom: 4px; }
+  .leaflet-control-attribution {
+    background: rgba(255,255,255,0.7) !important;
+    color: var(--ink-mute) !important;
+    font-size: 10px !important;
+  }
+  .leaflet-control-attribution a { color: var(--ink-soft) !important; }
+
+  /* ── DAY ───────────────────────────────────────────────── */
+  .day {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 80px;
+  }
+  .day:last-child { border-bottom: none; }
+  .day-head {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px;
+    align-items: end;
+    margin-bottom: 60px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .day-num {
+    font-family: var(--serif);
+    font-size: clamp(80px, 14vw, 200px);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+  }
+  .day-num .it { font-style: italic; color: var(--red); }
+  .day-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .day-date {
+    font-family: var(--serif);
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-style: italic;
+    line-height: 1.2;
+  }
+  .day-loc {
+    font-family: var(--sans);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+  }
+  .day-loc .ja { color: var(--ink-mute); margin-left: 8px; font-family: var(--serif); font-style: italic; text-transform: none; letter-spacing: 0; font-size: 14px; }
+  .day-today-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    margin-top: 8px;
+    align-self: start;
+  }
+
+  /* ── EVENTS ────────────────────────────────────────────── */
+  .events {
+    display: flex;
+    flex-direction: column;
+  }
+  .event {
+    display: grid;
+    grid-template-columns: 100px 1px 1fr;
+    gap: 28px;
+    padding: 24px 0;
+    border-top: 1px solid var(--line-soft);
+    transition: padding 0.25s;
+  }
+  .event:last-child { border-bottom: 1px solid var(--line-soft); }
+  .event:hover { padding-left: 8px; }
+  .event:hover .event-title { color: var(--red); }
+  .event:hover .event-line { background: var(--red); }
+  .event.now {
+    background: linear-gradient(90deg, rgba(188,0,45,0.04), transparent);
+    padding-left: 16px;
+    border-color: var(--red);
+  }
+  .event.now .event-line { background: var(--red); }
+  .event-time {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.1;
+    font-style: italic;
+  }
+  .event-time .end {
+    display: block;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-style: normal;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+  .event-time.placeholder { color: var(--ink-mute); }
+  .event-line { background: var(--ink); width: 1px; height: 100%; min-height: 40px; transition: background 0.25s; }
+  .event-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .event-title {
+    font-family: var(--serif);
+    font-size: clamp(20px, 2.4vw, 28px);
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    transition: color 0.25s;
+  }
+  .event-title .it { font-style: italic; }
+  .event-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .event-note {
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-family: var(--serif);
+    font-style: italic;
+    margin-top: 4px;
+  }
+  .event-links {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .event-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    font-size: 11px;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .event-link:hover {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .event-link.ticket:hover { background: var(--red); border-color: var(--red); }
+  .event-link::before { font-size: 12px; }
+  .event-link.maps::before { content: "↗"; }
+  .event-link.ticket::before { content: "✦"; color: var(--red); }
+  .event-link.ticket:hover::before { color: #fff; }
+  .event-link.book::before { content: "◇"; }
+  .event-link.info::before { content: "ⓘ"; font-size: 11px; }
+
+  .event.gap .event-time { opacity: 0.5; }
+  .event.gap .event-title { color: var(--ink-soft); }
+  .event.gap .event-line { background: var(--line); border-left: 1px dashed transparent; }
+
+  /* ── FOOTER ────────────────────────────────────────────── */
+  footer {
+    padding: 80px 32px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+  .footer-kanji {
+    font-family: var(--serif);
+    font-size: 80px;
+    line-height: 1;
+    color: var(--red);
+    margin-bottom: 16px;
+  }
+  .footer-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+  }
+  .footer-meta {
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 12px;
+  }
+
+  /* ── RESPONSIVE ────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    header { padding: 16px 20px; }
+    section { padding: 60px 20px; }
+    .section-info { margin: -60px -20px 50px; padding: 14px 20px; }
+    .hero { padding: 100px 20px 40px; }
+    .hero-info { margin-bottom: 40px; }
+    .hero-bottom { grid-template-columns: 1fr; gap: 20px; }
+    .hero-meta { text-align: left; }
+    .day { padding: 60px 0; }
+    .day-head { grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px; }
+    .event { grid-template-columns: 70px 1px 1fr; gap: 16px; padding: 20px 0; }
+    .event-time { font-size: 18px; }
+    .info-row { gap: 20px; padding: 24px 0; }
+    .menu-overlay { padding: 80px 20px 24px; }
+    .menu-row { grid-template-columns: 36px 1fr; gap: 16px; }
+    .menu-row .menu-meta { display: none; }
+    #map { height: 420px; }
+    .footer-kanji { font-size: 56px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#top" class="logo">jpn<span class="dot">.</span><span class="it">26</span></a>
+  <button class="menu-trigger" id="menuBtn"><span class="dot"></span> <span id="menuLbl">меню</span></button>
+</header>
+
+<div class="menu-overlay" id="menu">
+  <a href="#top" class="menu-row" data-close><div class="menu-num">00</div><div class="menu-title">главная <span class="it">accueil</span></div><div class="menu-meta">↑</div></a>
+  <a href="#map-section" class="menu-row" data-close><div class="menu-num">01</div><div class="menu-title">карта <span class="it">地図</span></div><div class="menu-meta">всё</div></a>
+  <a href="#timeline" class="menu-row" data-close><div class="menu-num">02</div><div class="menu-title">маршрут <span class="it">14 дней</span></div><div class="menu-meta">12 — 25.05</div></a>
+  <a href="#d12" class="menu-row" data-close><div class="menu-num">03</div><div class="menu-title">12 — 13 мая</div><div class="menu-meta">москва · пекин · токио</div></a>
+  <a href="#d14" class="menu-row" data-close><div class="menu-num">04</div><div class="menu-title">14 — 16 мая</div><div class="menu-meta">киото · осака</div></a>
+  <a href="#d16" class="menu-row" data-close><div class="menu-num">05</div><div class="menu-title">16 — 18 мая</div><div class="menu-meta">фудзи</div></a>
+  <a href="#d18" class="menu-row" data-close><div class="menu-num">06</div><div class="menu-title">18 — 23 мая</div><div class="menu-meta">токио</div></a>
+  <a href="#d24" class="menu-row" data-close><div class="menu-num">07</div><div class="menu-title">24 — 25 мая</div><div class="menu-meta">домой</div></a>
+</div>
+
+<!-- ════════ HERO ═════════════════════════════════════════ -->
+<div class="hero" id="top">
+  <div class="hero-info">
+    <span class="lbl">Маршрут <sup>(14)</sup></span>
+    путешествие четырёх по Японии — Токио, Киото, Осака, Фудзикавагутико. Отели, поезда, билеты и места — здесь.
+  </div>
+  <div>
+    <h1 class="hero-title">я<span class="it">п</span>они<span class="it">я</span></h1>
+    <div class="hero-bottom">
+      <div class="hero-dates">12 — 25 mai <sup>·</sup> 2026</div>
+      <div class="hero-meta">
+        путешествуют <sup>(04)</sup><br>
+        <span style="font-family:var(--serif);font-style:italic;font-size:18px;text-transform:none;letter-spacing:0;color:var(--ink);">Ксюша · Саша · Катя · Ангелина</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ INFOS ═══════════════════════════════════════ -->
+<section id="infos">
+  <div class="section-info">
+    <div class="left">информация</div>
+    <div class="arrow"></div>
+    <div class="right">(01 — 04)</div>
+  </div>
+  <div class="container">
+    <div class="info-grid">
+      <div class="info-row">
+        <div class="line"></div>
+        <div class="body">
+          <div class="info-num">01</div>
+          <h3 class="info-h">четыре подруги, четыре города, четырнадцать дней — от <span class="it">токио</span> через <span class="it">киото</span> и <span class="it">осаку</span> до подножия <span class="it">фудзи</span> и обратно</h3>
+          <div class="crew">
+            <span class="crew-pill">Ксюша</span>
+            <span class="crew-pill">Саша</span>
+            <span class="crew-pill">Катя</span>
+            <span class="crew-pill">Ангелина</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="line"></div>
+        <div class="body">
+          <div class="info-num">02</div>
+          <h3 class="info-h">забронировано и оплачено: <span class="it">все отели</span>, синкансены между городами, <span class="it">USJ</span> с Express Pass, teamLab Planets и музей Кусамы</h3>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="line"></div>
+        <div class="body">
+          <div class="info-num">03</div>
+          <h3 class="info-h">осталось <span class="it">долистать</span> до отлёта</h3>
+          <div class="countdown" id="countdown"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ MAP ════════════════════════════════════════ -->
+<section id="map-section">
+  <div class="section-info">
+    <div class="left">карта <sup>(16)</sup></div>
+    <div class="arrow"></div>
+    <div class="right">(02 — 04)</div>
+  </div>
+  <div class="container">
+    <div id="map"></div>
+  </div>
+</section>
+
+<!-- ════════ TIMELINE ═══════════════════════════════════ -->
+<section id="timeline">
+  <div class="section-info">
+    <div class="left">маршрут <sup>(14)</sup></div>
+    <div class="arrow"></div>
+    <div class="right">(03 — 04)</div>
+  </div>
+  <div class="container">
+
+  <!-- ═══ DAY 12 — TRAVEL ═══ -->
+  <div class="day" id="d12">
+    <div class="day-head">
+      <div class="day-num">1<span class="it">2</span></div>
+      <div class="day-meta">
+        <div class="day-date">вторник, 12 мая</div>
+        <div class="day-loc">Москва → Пекин <span class="ja">出発</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event">
+        <div class="event-time">17:15</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Вылет <span class="it">SVO → PKX</span></div>
+          <div class="event-sub">China Eastern MU-2076 · Шереметьево → Пекин Дасин · прилёт 13 мая 05:30</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Sheremetyevo+Airport+Terminal+B" target="_blank">Шереметьево</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 13 — ARRIVAL TOKYO ═══ -->
+  <div class="day" id="d13">
+    <div class="day-head">
+      <div class="day-num">1<span class="it">3</span></div>
+      <div class="day-meta">
+        <div class="day-date">среда, 13 мая</div>
+        <div class="day-loc">Пекин → Токио <span class="ja">東京到着</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event">
+        <div class="event-time">05:30<span class="end">пекин</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Прилёт в Пекин <span class="it">PKX</span></div>
+          <div class="event-sub">Пересадка ~9.5 часов в аэропорту Дасин</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">15:10<span class="end">→ 19:35</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">PKX → HND</span> Токио</div>
+          <div class="event-sub">ANA NH962 · Пекин Дасин → Ханэда · ~4 часа в воздухе</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">~21:00</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Из Ханэды в <span class="it">Хибию</span></div>
+          <div class="event-sub">Tokyo Monorail → JR Yamanote / Keikyu → Asakusa Line · ~40 мин</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">~22:00</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Заселение — <span class="it">remm Hibiya</span></div>
+          <div class="event-sub">Yurakucho 1-2-1, Тиёда · Токио · 1 ночь</div>
+          <div class="event-note">бронь №1539362313545740 · PIN 5857 · Ксюша + Ангелина (Саша + Катя — в том же отеле)</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=remm+Hibiya+Tokyo" target="_blank">Карта</a>
+            <a class="event-link info" href="tel:+81-3-35070606">+81-3-3507-0606</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 14 — TOKYO → KYOTO ═══ -->
+  <div class="day" id="d14">
+    <div class="day-head">
+      <div class="day-num">1<span class="it">4</span></div>
+      <div class="day-meta">
+        <div class="day-date">четверг, 14 мая</div>
+        <div class="day-loc">Токио → Киото <span class="ja">京都へ</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event">
+        <div class="event-time">~06:30</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Выезд на <span class="it">Tokyo Station</span></div>
+          <div class="event-sub">Из Хибии 5-7 минут на JR Yamanote или 15 мин пешком</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">07:12<span class="end">→ 09:23</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Синкансен <span class="it">Nozomi #9</span> · Токио → Киото</div>
+          <div class="event-sub">JR Tokaido Shinkansen · 2 ч 11 мин · свободная посадка</div>
+          <div class="event-note">бронь Trip.com №2078 · 4 QR-билета</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Tokyo+Station" target="_blank">Tokyo St.</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Kyoto+Station" target="_blank">Kyoto St.</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">~10</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Завтрак и <span class="it">камера хранения</span></div>
+          <div class="event-sub">Чемоданы — в отель или в coin lockers Kyoto Station (заселение с 15:00)</div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">11 — 15</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Свободно — <span class="it">старый Киото</span></div>
+          <div class="event-sub">Идеи: Fushimi Inari (тысячи красных тории), Gion (квартал гейш), Kiyomizu-dera</div>
+          <div class="event-note">с поезда — лёгкий день: гулять по Gion и набережной Камогавы</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Fushimi+Inari+Taisha" target="_blank">Fushimi Inari</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Gion+Kyoto" target="_blank">Gion</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Kiyomizu-dera" target="_blank">Kiyomizu-dera</a>
+          </div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">15:00<span class="end">после</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Заселение — <span class="it">Hilton Garden Inn</span> Kyoto Shijo Karasuma</div>
+          <div class="event-sub">397 Gojo Karasuma Cho, Симогё · Киото · 2 ночи · twin</div>
+          <div class="event-note">бронь №3422554766 · PIN 2129 · Ксюша + Ангелина (Саша + Катя — там же)</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Hilton+Garden+Inn+Kyoto+Shijo+Karasuma" target="_blank">Карта</a>
+            <a class="event-link info" href="tel:+81-75-3205111">+81-75-320-5111</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">19 — 22</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Ужин в <span class="it">Pontocho</span> или Nishiki Market</div>
+          <div class="event-sub">Узкая улочка вдоль Камогавы — традиционный ресторанный квартал</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Pontocho+Alley+Kyoto" target="_blank">Pontocho</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Nishiki+Market" target="_blank">Nishiki</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 15 — USJ OSAKA ═══ -->
+  <div class="day" id="d15">
+    <div class="day-head">
+      <div class="day-num">1<span class="it">5</span></div>
+      <div class="day-meta">
+        <div class="day-date">пятница, 15 мая</div>
+        <div class="day-loc">Киото → Осака · USJ <span class="ja">大阪</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event">
+        <div class="event-time">~07:30</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Выезд в <span class="it">Осаку</span></div>
+          <div class="event-sub">JR Special Rapid Kyoto → Osaka (~30 мин) → JR Yumesaki Line до Universal City (~12 мин)</div>
+          <div class="event-note">USJ открывается в 9:00. К воротам комфортно к 8:30</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">09:00<span class="end">весь день</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Universal Studios <span class="it">Japan</span></div>
+          <div class="event-sub">Studio Pass × 4 + Express Pass 8 (Minion & MineCart Special) × 4</div>
+          <div class="event-note">по Express: Mario Kart 12:00 · Mine Cart Madness 13:00 · Hippogriff 14:50 · Villain-Con 10:30</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Universal+Studios+Japan" target="_blank">USJ</a>
+            <a class="event-link ticket" href="https://www.usj.co.jp/web/en/us" target="_blank">Сайт</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">после</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Ужин в <span class="it">Дотонбори</span></div>
+          <div class="event-sub">Главная стрит-фуд улица: takoyaki, okonomiyaki, гигантский неоновый краб</div>
+          <div class="event-note">если останутся силы — иначе сразу домой в Киото</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Dotonbori+Osaka" target="_blank">Dotonbori</a>
+          </div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">~22</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Возвращение в <span class="it">Киото</span></div>
+          <div class="event-sub">JR Yumesaki → JR Kyoto Line · ~50 мин до Hilton Garden Inn</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 16 — KYOTO → FUJI ═══ -->
+  <div class="day" id="d16">
+    <div class="day-head">
+      <div class="day-num">1<span class="it">6</span></div>
+      <div class="day-meta">
+        <div class="day-date">суббота, 16 мая</div>
+        <div class="day-loc">Киото → Фудзикавагутико <span class="ja">富士河口湖</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event">
+        <div class="event-time">~09:00</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Чек-аут из <span class="it">Hilton Garden Inn</span></div>
+          <div class="event-sub">Выезд до 12:00 · идём на Kyoto Station</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">10:07<span class="end">~1ч 40м</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Синкансен <span class="it">Киото → Мисима</span></div>
+          <div class="event-sub">JR Tokaido Shinkansen · 4 брони Trip.com</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Mishima+Station" target="_blank">Mishima St.</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">~12:30</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Автобус <span class="it">Мисима → Кавагутико</span></div>
+          <div class="event-sub">Fujikyu Bus · ~1.5 часа · билет на месте</div>
+          <div class="event-note">обратный автобус 18 мая уже забронирован</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">15:00<span class="end">после</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Заселение — <span class="it">Spacious House</span> with Mt. Fuji Views</div>
+          <div class="event-sub">2357-2 Fujikawaguchiko · Airbnb · вид на Фудзи · BBQ на крыше · 2 ночи · все 4</div>
+          <div class="event-note">код HMSEZFD4CB · host Yoshi</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=2357-2+Fujikawaguchiko+Yamanashi" target="_blank">Карта</a>
+            <a class="event-link info" href="tel:+81-70-8900-3776">Yoshi</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">вечер</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">BBQ</span> на крыше с видом на Фудзи</div>
+          <div class="event-sub">Купить продукты в Lawson или FamilyMart по дороге</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 17 — FUJI ═══ -->
+  <div class="day" id="d17">
+    <div class="day-head">
+      <div class="day-num">1<span class="it">7</span></div>
+      <div class="day-meta">
+        <div class="day-date">воскресенье, 17 мая</div>
+        <div class="day-loc">Фудзикавагутико <span class="ja">富士山</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event gap">
+        <div class="event-time placeholder">утро</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Открыточные <span class="it">виды</span> на Фудзи</div>
+          <div class="event-sub">Chureito Pagoda (та самая пагода + Фудзи), Oishi Park у северного берега озера</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Chureito+Pagoda" target="_blank">Chureito</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Oishi+Park+Kawaguchiko" target="_blank">Oishi Park</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">день</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Озеро Кавагути или <span class="it">Fuji-Q Highland</span></div>
+          <div class="event-sub">Прогулка вокруг озера, канатка на Mt. Tenjo, или парк аттракционов Fuji-Q</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Mt+Kachi+Kachi+Ropeway" target="_blank">Канатка</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Fuji-Q+Highland" target="_blank">Fuji-Q</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">вечер</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Онсэн</span> с видом на Фудзи</div>
+          <div class="event-sub">Yurari или Fujiyama Onsen — традиционные горячие источники</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Yurari+Onsen+Narusawa" target="_blank">Yurari</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 18 — FUJI → TOKYO ═══ -->
+  <div class="day" id="d18">
+    <div class="day-head">
+      <div class="day-num">1<span class="it">8</span></div>
+      <div class="day-meta">
+        <div class="day-date">понедельник, 18 мая</div>
+        <div class="day-loc">Фудзи → Токио · Сиодомэ <span class="ja">汐留</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event">
+        <div class="event-time">~09:30</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Чек-аут из <span class="it">Airbnb</span></div>
+          <div class="event-sub">Выезд до 10:00</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">09:55<span class="end">→ 11:25</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Limited Express <span class="it">Mishima/Kawaguchiko Liner</span></div>
+          <div class="event-sub">Kawaguchiko Station → Mishima Station North Exit · 1 ч 30 мин · Wi-Fi на борту</div>
+          <div class="event-note">order W000329238 · места 04C, 04D, 05C, 05D</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">11:58<span class="end">~50 мин</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Синкансен <span class="it">Мисима → Токио</span></div>
+          <div class="event-sub">JR Tokaido Shinkansen Hikari/Kodama · 4 брони Trip.com</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">15:00<span class="end">после</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Заселение — <span class="it">Mitsui Garden Hotel</span> Shiodome Italia-Gai</div>
+          <div class="event-sub">2-14-24 Минато · Токио · 6 ночей · queen</div>
+          <div class="event-note">бронь №1539362341935698 · PIN 6630 · Ксюша + Ангелина (Саша + Катя — там же)</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Mitsui+Garden+Hotel+Shiodome+Italia-Gai" target="_blank">Карта</a>
+            <a class="event-link info" href="tel:+81-3-34311131">+81-3-3431-1131</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">вечер</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Прогулка в <span class="it">Гинзе</span></div>
+          <div class="event-sub">10 минут пешком от Сиодомэ. Огни, бутики, гигантский экран Sony</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Ginza+Tokyo" target="_blank">Ginza</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 19 — TOKYO ═══ -->
+  <div class="day" id="d19">
+    <div class="day-head">
+      <div class="day-num">1<span class="it">9</span></div>
+      <div class="day-meta">
+        <div class="day-date">вторник, 19 мая</div>
+        <div class="day-loc">Токио · Асакуса · Скай-Три <span class="ja">浅草</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event gap">
+        <div class="event-time placeholder">утро</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Senso-ji</span> в Асакусе</div>
+          <div class="event-sub">Самый старый храм Токио. Улица Nakamise со стрит-фудом и сувенирами</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Senso-ji+Temple" target="_blank">Senso-ji</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">день</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Tokyo <span class="it">Skytree</span></div>
+          <div class="event-sub">Самая высокая башня Японии — 634 м · виды на весь Токио</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Tokyo+Skytree" target="_blank">Skytree</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">вечер</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Суши</span> в Тоёсу или <span class="it">ramen</span> в Акихабаре</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 20 — TEAMLAB ═══ -->
+  <div class="day" id="d20">
+    <div class="day-head">
+      <div class="day-num">2<span class="it">0</span></div>
+      <div class="day-meta">
+        <div class="day-date">среда, 20 мая</div>
+        <div class="day-loc">Токио · Сибуя · teamLab <span class="ja">渋谷</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event gap">
+        <div class="event-time placeholder">день</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Сибуя</span> · Hachiko · Crossing</div>
+          <div class="event-sub">Самый знаменитый перекрёсток мира. Смотровая Shibuya Sky на закате</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Shibuya+Crossing" target="_blank">Crossing</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Shibuya+Sky" target="_blank">Shibuya Sky</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">~15:30</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Выдвигаемся в <span class="it">Тоёсу</span></div>
+          <div class="event-sub">До teamLab Planets ~30-40 мин · Yurakucho Line → Yurikamome</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">17:00<span class="end">ксюша</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">teamLab <span class="it">Planets</span> — Ксюша</div>
+          <div class="event-sub">Toyosu 6-1-16 · вход в воду босиком · ~90 минут внутри</div>
+          <div class="event-note">booking CTRIP-20260417-JWRX · короткие шорты или ренталь на месте</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=teamLab+Planets+Toyosu" target="_blank">Карта</a>
+            <a class="event-link ticket" href="https://www.teamlab.art/e/planets/" target="_blank">teamLab</a>
+          </div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">17:30<span class="end">×3</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">teamLab <span class="it">Planets</span> — Саша · Катя · Ангелина</div>
+          <div class="event-sub">Тот же музей, заход через 30 минут — внутри быстро находим друг друга</div>
+          <div class="event-note">booking CTRIP-20260417-ZDNQ · 3 взрослых</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 21 — KUSAMA + HARAJUKU ═══ -->
+  <div class="day" id="d21">
+    <div class="day-head">
+      <div class="day-num">2<span class="it">1</span></div>
+      <div class="day-meta">
+        <div class="day-date">четверг, 21 мая</div>
+        <div class="day-loc">Токио · Кусама · Харадзюку <span class="ja">草間彌生</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event gap">
+        <div class="event-time placeholder">утро</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Meiji Jingu</span></div>
+          <div class="event-sub">Огромный храм в лесу прямо в центре города. По дороге к Кусаме</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Meiji+Jingu" target="_blank">Meiji Jingu</a>
+          </div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">12:00<span class="end">90 мин слот</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Музей <span class="it">Yayoi Kusama</span></div>
+          <div class="event-sub">107 Bentencho, Синдзюку · выставка KUSAMA's POP · вход в течение 30 минут от 12:00</div>
+          <div class="event-note">билет №582 825 8266 · на Катю (Filippova Ekaterina) · ¥1100 · уточнить билеты на остальных</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Yayoi+Kusama+Museum" target="_blank">Карта</a>
+            <a class="event-link ticket" href="https://yayoikusamamuseum.jp/en/" target="_blank">Сайт</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">день</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Takeshita Street</span> · Харадзюку</div>
+          <div class="event-sub">Капибара-кафе, кавайные магазины, радужная сладкая вата</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Takeshita+Street" target="_blank">Takeshita St.</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">вечер</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Синдзюку — <span class="it">Omoide Yokocho</span> · Golden Gai</div>
+          <div class="event-sub">Узкие улочки с микро-барами, якитори и атмосферой old-school Tokyo</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Omoide+Yokocho" target="_blank">Omoide Yokocho</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Golden+Gai" target="_blank">Golden Gai</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 22 — TOKYO ═══ -->
+  <div class="day" id="d22">
+    <div class="day-head">
+      <div class="day-num">2<span class="it">2</span></div>
+      <div class="day-meta">
+        <div class="day-date">пятница, 22 мая</div>
+        <div class="day-loc">Токио · Акихабара · Уэно <span class="ja">秋葉原</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event gap">
+        <div class="event-time placeholder">день</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Акихабара</span></div>
+          <div class="event-sub">Электроника, аниме, ретро-аркады, мейд-кафе</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Akihabara" target="_blank">Akihabara</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">после</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Парк <span class="it">Уэно</span> или Yanaka Ginza</div>
+          <div class="event-sub">Ретро-район, традиционные ремесленники, кошки</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Yanaka+Ginza" target="_blank">Yanaka</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 23 — TOKYO ═══ -->
+  <div class="day" id="d23">
+    <div class="day-head">
+      <div class="day-num">2<span class="it">3</span></div>
+      <div class="day-meta">
+        <div class="day-date">суббота, 23 мая</div>
+        <div class="day-loc">Токио · последний день <span class="ja">最終日</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event gap">
+        <div class="event-time placeholder">день</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Шопинг</span> и сувениры</div>
+          <div class="event-sub">Don Quijote (мульти-этажный универсам), Kitte (premium souvenirs), Ginza Six</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=Don+Quijote+Shibuya" target="_blank">Donki</a>
+            <a class="event-link maps" href="https://maps.google.com/?q=Kitte+Tokyo" target="_blank">Kitte</a>
+          </div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">вечер</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Прощальный <span class="it">ужин</span></div>
+          <div class="event-sub">Изакая рядом с отелем или ужин на смотровой Tokyo Tower</div>
+        </div>
+      </div>
+      <div class="event gap">
+        <div class="event-time placeholder">ночь</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Собираем <span class="it">чемоданы</span></div>
+          <div class="event-sub">Ранний выезд завтра — встаём в 06:00, выезжаем в 06:30</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 24 — TOKYO → BEIJING ═══ -->
+  <div class="day" id="d24">
+    <div class="day-head">
+      <div class="day-num">2<span class="it">4</span></div>
+      <div class="day-meta">
+        <div class="day-date">воскресенье, 24 мая</div>
+        <div class="day-loc">Токио → Пекин <span class="ja">帰国</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event">
+        <div class="event-time">~06:00</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Чек-аут</span> из Mitsui Garden</div>
+          <div class="event-sub">Выезд из отеля до 11:00, но самолёт ранний — выехать в 06:30</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">~07:00</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">До <span class="it">Ханэды</span></div>
+          <div class="event-sub">Asakusa Line Direct → Haneda · ~30 минут</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">08:55<span class="end">→ 12:00</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">HND → PKX</span></div>
+          <div class="event-sub">ANA NH961 · Ханэда → Пекин Дасин</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">12:00<span class="end">пекин</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Прилёт в <span class="it">Пекин</span></div>
+          <div class="event-sub">Длинная пересадка ~24 часа</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DAY 25 — BEIJING → MOSCOW ═══ -->
+  <div class="day" id="d25">
+    <div class="day-head">
+      <div class="day-num">2<span class="it">5</span></div>
+      <div class="day-meta">
+        <div class="day-date">понедельник, 25 мая</div>
+        <div class="day-loc">Пекин → Москва <span class="ja">帰宅</span></div>
+      </div>
+    </div>
+    <div class="events">
+      <div class="event">
+        <div class="event-time">11:55<span class="end">→ 15:25</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">PKX → SVO</span></div>
+          <div class="event-sub">China Eastern MU-2075 · Пекин → Шереметьево · ~8 часов</div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">15:25</div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title"><span class="it">Дома!</span></div>
+          <div class="event-sub">Шереметьево, Москва · конец путешествия</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-kanji">またね</div>
+  <div class="footer-text">матанэ — до встречи</div>
+  <div class="footer-meta">сделано для Ксюши, Саши, Кати, Ангелины · 2026</div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+  // ── MENU ──────────────────────────────────────────────
+  const menu = document.getElementById('menu');
+  const btn = document.getElementById('menuBtn');
+  const lbl = document.getElementById('menuLbl');
+  btn.addEventListener('click', () => {
+    const open = menu.classList.toggle('open');
+    lbl.textContent = open ? 'закрыть' : 'меню';
+  });
+  document.querySelectorAll('[data-close]').forEach(a => {
+    a.addEventListener('click', () => {
+      menu.classList.remove('open');
+      lbl.textContent = 'меню';
+    });
+  });
+
+  // ── COUNTDOWN ─────────────────────────────────────────
+  const tripStart = new Date('2026-05-12T17:15:00+03:00');
+  const tripEnd = new Date('2026-05-25T15:25:00+03:00');
+  function updateCountdown() {
+    const now = new Date();
+    const el = document.getElementById('countdown');
+    if (!el) return;
+    if (now < tripStart) {
+      const diff = tripStart - now;
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      el.innerHTML = `
+        <div class="cd-item"><div class="num red">${days}</div><div class="lbl">дней</div></div>
+        <div class="cd-item"><div class="num">${String(hours).padStart(2,'0')}</div><div class="lbl">часов</div></div>
+        <div class="cd-item"><div class="num">${String(mins).padStart(2,'0')}</div><div class="lbl">минут</div></div>`;
+    } else if (now < tripEnd) {
+      const dayOfTrip = Math.floor((now - tripStart) / 86400000) + 1;
+      el.innerHTML = `
+        <div class="cd-item"><div class="num red">${dayOfTrip}</div><div class="lbl">день в пути</div></div>
+        <div class="cd-item"><div class="num">14</div><div class="lbl">всего</div></div>`;
+    } else {
+      el.innerHTML = `<div class="cd-item"><div class="num red">∞</div><div class="lbl">путешествие завершено</div></div>`;
+    }
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 60000);
+
+  // ── MAP (LIGHT THEME) ─────────────────────────────────
+  const map = L.map('map', { zoomControl: true, scrollWheelZoom: false }).setView([35.5, 137.0], 5);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap, © CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 19,
+    pane: 'overlayPane'
+  }).addTo(map);
+
+  const points = [
+    { lat: 35.6754, lng: 139.7600, name: 'remm Hibiya', sub: 'Токио · 13—14 мая' },
+    { lat: 35.6812, lng: 139.7671, name: 'Tokyo Station', sub: '14 мая 07:12 → Киото' },
+    { lat: 34.9858, lng: 135.7580, name: 'Kyoto Station', sub: '14 мая 09:23' },
+    { lat: 34.9967, lng: 135.7593, name: 'Hilton Garden Inn Kyoto', sub: 'Киото · 14—16 мая' },
+    { lat: 34.9671, lng: 135.7727, name: 'Fushimi Inari', sub: 'идея на 14—15 мая' },
+    { lat: 34.6654, lng: 135.4323, name: 'Universal Studios Japan', sub: 'Осака · 15 мая' },
+    { lat: 34.6687, lng: 135.5026, name: 'Dotonbori', sub: 'идея на ужин 15 мая' },
+    { lat: 35.1273, lng: 138.9112, name: 'Mishima Station', sub: '16 мая · пересадка' },
+    { lat: 35.4977, lng: 138.7531, name: 'Airbnb Fuji House', sub: 'Фудзикавагутико · 16—18 мая' },
+    { lat: 35.5036, lng: 138.7717, name: 'Chureito Pagoda', sub: 'идея на 17 мая' },
+    { lat: 35.6651, lng: 139.7605, name: 'Mitsui Garden Hotel Shiodome', sub: 'Токио · 18—24 мая' },
+    { lat: 35.7148, lng: 139.7967, name: 'Senso-ji', sub: 'идея на 19 мая' },
+    { lat: 35.6481, lng: 139.7892, name: 'teamLab Planets', sub: '20 мая 17:00' },
+    { lat: 35.6580, lng: 139.7016, name: 'Shibuya Crossing', sub: '20 мая' },
+    { lat: 35.7008, lng: 139.7155, name: 'Yayoi Kusama Museum', sub: '21 мая 12:00' },
+    { lat: 35.6764, lng: 139.6993, name: 'Meiji Jingu', sub: 'идея на 21 мая' },
+    { lat: 35.5494, lng: 139.7798, name: 'Haneda Airport', sub: '13 / 24 мая' },
+  ];
+
+  points.forEach(p => {
+    const icon = L.divIcon({
+      className: 'pin',
+      html: `<div style="background:#bc002d;width:10px;height:10px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(188,0,45,0.3);"></div>`,
+      iconSize: [10, 10],
+      iconAnchor: [5, 5]
+    });
+    L.marker([p.lat, p.lng], { icon }).addTo(map)
+      .bindPopup(`<b>${p.name}</b>${p.sub}`);
+  });
+
+  // Routes
+  const routeStyle = { color: '#bc002d', weight: 1.5, opacity: 0.5, dashArray: '4, 6' };
+  L.polyline([[35.6812,139.7671],[34.9858,135.7580]], routeStyle).addTo(map);
+  L.polyline([[34.9858,135.7580],[34.6654,135.4323]], routeStyle).addTo(map);
+  L.polyline([[34.9858,135.7580],[35.1273,138.9112]], routeStyle).addTo(map);
+  L.polyline([[35.1273,138.9112],[35.4977,138.7531]], routeStyle).addTo(map);
+  L.polyline([[35.4977,138.7531],[35.1273,138.9112]], routeStyle).addTo(map);
+  L.polyline([[35.1273,138.9112],[35.6651,139.7605]], routeStyle).addTo(map);
+
+  map.fitBounds(L.latLngBounds(points.map(p => [p.lat, p.lng])).pad(0.1));
+
+  // ── HIGHLIGHT TODAY ──────────────────────────────────
+  const today = new Date();
+  if (today.getFullYear() === 2026 && today.getMonth() === 4) {
+    const day = today.getDate();
+    if (day >= 12 && day <= 25) {
+      const todayEl = document.getElementById('d' + day);
+      if (todayEl) {
+        const meta = todayEl.querySelector('.day-meta');
+        const badge = document.createElement('div');
+        badge.className = 'day-today-badge';
+        badge.textContent = 'сегодня';
+        meta.appendChild(badge);
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
