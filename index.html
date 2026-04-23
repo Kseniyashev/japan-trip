@@ -21,21 +21,103 @@
     --red-soft: #d4334e;
     --serif: "Instrument Serif", "Cormorant Garamond", "Times New Roman", serif;
     --sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+    /* закатная палитра — JS обновляет эти переменные на скролле */
+    --sky-top: #eef3fb;
+    --sky-bot: #fafaf7;
+    --sun-color: #ffd84d;
+    --sun-glow: rgba(255, 216, 77, 0.45);
+    --sun-y: 12vh;
+    --paper-alpha: 1;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     font-family: var(--sans);
-    background: var(--bg);
+    background: transparent;
     color: var(--ink);
     line-height: 1.5;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    transition: color 0.4s ease;
   }
 
   ::selection { background: var(--red); color: #fff; }
+
+  /* ── SKY + SUN (scroll-driven) ─────────────────────────── */
+  .sky {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bot) 100%);
+    pointer-events: none;
+  }
+  .sun {
+    position: fixed;
+    left: 50%;
+    top: 0;
+    width: 340px;
+    height: 340px;
+    margin-left: -170px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%,
+      var(--sun-color) 0%,
+      var(--sun-color) 35%,
+      color-mix(in oklab, var(--sun-color) 40%, transparent) 55%,
+      transparent 72%);
+    transform: translateY(var(--sun-y));
+    z-index: -1;
+    pointer-events: none;
+    filter: blur(1px);
+    will-change: transform, background;
+  }
+  .stars {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    background-image:
+      radial-gradient(1px 1px at 15% 20%, #fff, transparent),
+      radial-gradient(1px 1px at 32% 65%, #fff, transparent),
+      radial-gradient(2px 2px at 48% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 65% 55%, #fff, transparent),
+      radial-gradient(1px 1px at 78% 18%, #fff, transparent),
+      radial-gradient(2px 2px at 88% 72%, #fff, transparent),
+      radial-gradient(1px 1px at 22% 88%, #fff, transparent),
+      radial-gradient(1px 1px at 55% 82%, #fff, transparent),
+      radial-gradient(1px 1px at 8% 50%, #fff, transparent),
+      radial-gradient(2px 2px at 92% 40%, #fff, transparent);
+    background-size: 100% 100%;
+    transition: opacity 0.5s ease;
+  }
+  .stars.on { opacity: 0.85; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sun, .sky { display: none; }
+  }
+
+  /* ── DUSK MODE — текст светлеет на тёмном закатном небе ──── */
+  body.dusk {
+    --ink: #f5f1e8;
+    --ink-soft: #c8bed9;
+    --ink-mute: #8f86a5;
+    --line: rgba(245, 241, 232, 0.18);
+    --line-soft: rgba(245, 241, 232, 0.08);
+  }
+  body.dusk header {
+    background: rgba(18, 15, 42, 0.55);
+    border-bottom-color: rgba(245, 241, 232, 0.12);
+  }
+  body.dusk .menu-overlay {
+    background: rgba(12, 10, 32, 0.96);
+  }
+  body.dusk .event:hover { background: linear-gradient(90deg, rgba(255,140,120,0.10), transparent); }
+  body.dusk .info-row .line,
+  body.dusk .event-line { background: var(--ink-soft); }
+  body.dusk .event.gap .event-line { background: var(--line); }
 
   /* ── HEADER ────────────────────────────────────────────── */
   header {
@@ -533,6 +615,10 @@
 </head>
 <body>
 
+<div class="sky"></div>
+<div class="sun"></div>
+<div class="stars" id="stars"></div>
+
 <header>
   <a href="#top" class="logo">jpn<span class="dot">.</span><span class="it">26</span></a>
   <button class="menu-trigger" id="menuBtn"><span class="dot"></span> <span id="menuLbl">меню</span></button>
@@ -886,6 +972,7 @@
           <div class="event-links">
             <a class="event-link book" href="https://drive.google.com/file/d/1Hw0fBBMfKNvh5KX6J9CikFQVWKfaWIlE/view" target="_blank">Ваучер</a>
             <a class="event-link ticket" href="https://sekitori.jp/en/apps/user/ticket/?orderNo=3e8095c417e195230d4cb99db05cdb886c9f8ef0f69f46de08cb7b7bbe5d61b86d56b69f811dbfba5f31&reservationNo=ae2ebd02e2499a081d811c829d41778f384c15509be3b1d4dc3e5ee9759d1be0109ec2beba7fd95e20525c68&reserverId=7cd953fcbeddce54f4c38febecc8a7c3872ad28431119b93b2212868a20cb53d345f055ecfef" target="_blank">QR билет</a>
+            <a class="event-link ticket" href="https://drive.google.com/file/d/13pM51GzZnBQ0kOX5EA546_LqwEuTkSxD/view" target="_blank">QR фото</a>
           </div>
         </div>
       </div>
@@ -989,6 +1076,7 @@
           <div class="event-links">
             <a class="event-link book" href="https://drive.google.com/file/d/1UvSAfZ-vO-_BgMshT4zGx2SBxDFs4-zJ/view" target="_blank">Ваучер</a>
             <a class="event-link ticket" href="https://sekitori.jp/en/apps/user/ticket/?orderNo=f71856f4996b71c835e70e46b2de49f458d42af1e5126f78d4987d998807c8307a88e20ed65235f1e1a8&reservationNo=b94ba302f9cbe445dd9a11ff9dc2135b93050852c6b97223e9f44910b4c5f3811772649edf6280e2bf5f5740&reserverId=1dfec0209e6a6cc3f23de0619d4cb18ea184ac2c07933bf9008ee8988e548a47bdf8b9365d0e" target="_blank">QR билет</a>
+            <a class="event-link ticket" href="https://drive.google.com/file/d/1Ab9P1aLqwBjqh31bCx7y_gEuQZNslqcf/view" target="_blank">QR фото</a>
           </div>
         </div>
       </div>
@@ -1005,11 +1093,24 @@
         <div class="event-line"></div>
         <div class="event-body">
           <div class="event-title">Заселение — <span class="it">Mitsui Garden Hotel</span> Shiodome Italia-Gai</div>
-          <div class="event-sub">2-14-24 Минато · Токио · 6 ночей · queen</div>
-          <div class="event-note">бронь №1539362341935698 · PIN 6630 · Ксюша + Ангелина (Саша + Катя — там же)</div>
+          <div class="event-sub">2-14-24 Минато · Токио · 6 ночей · queen · Ксюша + Ангелина</div>
+          <div class="event-note">бронь №1539362341935698 · PIN 6630</div>
           <div class="event-links">
             <a class="event-link maps" href="https://maps.google.com/?q=Mitsui+Garden+Hotel+Shiodome+Italia-Gai" target="_blank">Карта</a>
             <a class="event-link info" href="tel:+81-3-34311131">+81-3-3431-1131</a>
+          </div>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-time">15:00<span class="end">после</span></div>
+        <div class="event-line"></div>
+        <div class="event-body">
+          <div class="event-title">Заселение — <span class="it">The Royal Park Hotel Iconic</span> Tokyo Shiodome</div>
+          <div class="event-sub">1-6-3 Минато · Шиодомэ · в 5 мин от Mitsui · Саша + Катя</div>
+          <div class="event-note">подтвердить у девочек: точные даты, номер брони, PIN</div>
+          <div class="event-links">
+            <a class="event-link maps" href="https://maps.google.com/?q=The+Royal+Park+Hotel+Iconic+Tokyo+Shiodome" target="_blank">Карта</a>
+            <a class="event-link info" href="tel:+81-3-64313333">+81-3-6431-3333</a>
           </div>
         </div>
       </div>
@@ -1371,6 +1472,64 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
+  // ── SKY / SUN — scroll-driven palette ─────────────────
+  (function () {
+    const root = document.documentElement;
+    const stars = document.getElementById('stars');
+    // опорные точки палитры [progress, skyTop, skyBot, sun, sunGlow]
+    const stops = [
+      { p: 0.00, skyTop: [238,243,251], skyBot: [250,250,247], sun: [255,216, 77], glow: 0.45 },
+      { p: 0.30, skyTop: [255,225,198], skyBot: [253,236,215], sun: [255,184, 82], glow: 0.55 },
+      { p: 0.55, skyTop: [235,128,120], skyBot: [255,178,120], sun: [255,110, 70], glow: 0.60 },
+      { p: 0.75, skyTop: [ 76, 54,108], skyBot: [186, 82,108], sun: [201, 66, 80], glow: 0.40 },
+      { p: 1.00, skyTop: [  8, 11, 40], skyBot: [ 28, 32, 75], sun: [ 50, 30, 70], glow: 0.15 },
+    ];
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const rgb = arr => `rgb(${arr.map(v => Math.round(v)).join(',')})`;
+    function sample(p) {
+      p = Math.max(0, Math.min(1, p));
+      let i = 0;
+      while (i < stops.length - 1 && stops[i + 1].p < p) i++;
+      const a = stops[i], b = stops[Math.min(i + 1, stops.length - 1)];
+      const t = b.p === a.p ? 0 : (p - a.p) / (b.p - a.p);
+      return {
+        skyTop: [0,1,2].map(k => lerp(a.skyTop[k], b.skyTop[k], t)),
+        skyBot: [0,1,2].map(k => lerp(a.skyBot[k], b.skyBot[k], t)),
+        sun:    [0,1,2].map(k => lerp(a.sun[k],    b.sun[k],    t)),
+        glow:   lerp(a.glow, b.glow, t),
+      };
+    }
+    let ticking = false;
+    function update() {
+      ticking = false;
+      const doc = document.documentElement;
+      const max = (doc.scrollHeight - window.innerHeight) || 1;
+      const p = window.scrollY / max;
+      const c = sample(p);
+      root.style.setProperty('--sky-top', rgb(c.skyTop));
+      root.style.setProperty('--sky-bot', rgb(c.skyBot));
+      root.style.setProperty('--sun-color', rgb(c.sun));
+      root.style.setProperty('--sun-glow', `rgba(${Math.round(c.sun[0])},${Math.round(c.sun[1])},${Math.round(c.sun[2])},${c.glow})`);
+      // солнце опускается от ~12vh до ~100vh (за горизонт)
+      const sunY = 12 + p * 95;
+      root.style.setProperty('--sun-y', sunY + 'vh');
+      // тёмная тема текста после 72%
+      const dark = p > 0.72;
+      document.body.classList.toggle('dusk', dark);
+      // звёзды появляются в последние 20%
+      if (stars) stars.classList.toggle('on', p > 0.82);
+    }
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
+
   // ── MENU ──────────────────────────────────────────────
   const menu = document.getElementById('menu');
   const btn = document.getElementById('menuBtn');
